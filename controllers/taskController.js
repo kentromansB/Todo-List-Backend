@@ -48,25 +48,37 @@ async function fetchCompletedTask(req, res) {
   const todo = await Tasks.find({ user_id: user_id, completed: "true" });
   res.json(todo);
 }
-
+// Express Update Task Function
 async function updateTask(req, res) {
-  const { title, description, completed } = req.body;
-  const todo = await Tasks.findByIdAndUpdate(
-    req.params.id,
-    { title, description, completed },
-    { new: true }
-  );
-  res.json(todo);
+  const { id } = req.params;
+  const { title, description, deadline, completed, username, user_id } =
+    req.body;
+
+  try {
+    const todo = await Tasks.findByIdAndUpdate(
+      req.params.id,
+      { title, description, deadline, completed, username, user_id },
+      { new: true }
+    );
+    res.send(todo);
+    // res.json(todo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
 }
 
-// router.delete('/todo/:id', async (req, res) => {
-//     await Todo.findByIdAndDelete(req.params.id);
-//     res.status(204).send();
-// });
+// Express Delete Task Function
+async function deleteTask(req, res) {
+  await Tasks.findByIdAndDelete(req.params.id);
+  res.status(204).send();
+}
 
 module.exports = {
   createTask,
   fetchTask,
   fetchPendingTask,
   fetchCompletedTask,
+  updateTask,
+  deleteTask,
 };
